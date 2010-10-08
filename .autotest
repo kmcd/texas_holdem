@@ -1,0 +1,5 @@
+begin
+  require 'redgreen/autotest'
+rescue
+  puts "gem install redgreen for colorized output"
+end

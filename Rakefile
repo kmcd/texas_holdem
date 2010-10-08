@@ -50,3 +50,27 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+
+desc 'Create class & unit test'
+task :class, :name do |task,args|
+  class_name = args.name.capitalize
+  file_name  = args.name.downcase
+  
+  write_to "lib/#{file_name}.rb", %Q{class TexasHoldem::#{class_name}
+end}
+
+  write_to "test/test_#{file_name}.rb", %Q{require 'helper'
+class #{class_name}Test < Test::Unit::TestCase
+  def setup
+  end
+  
+  test "should " do
+    flunk
+  end
+end}
+
+end
+
+def write_to(local_filename,text)
+  File.open(local_filename, 'w') {|f| f.write(text) }
+end

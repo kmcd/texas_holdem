@@ -1,7 +1,9 @@
 require 'helper'
 
-class TestTexasHoldem < Test::Unit::TestCase
-  def test_something_for_real
-    flunk "hey buddy, you should probably rename this file and start testing for real"
+class TexasHoldemTest < Test::Unit::TestCase
+  def setup
+  end
+  
+  test "should" do
   end
 end
