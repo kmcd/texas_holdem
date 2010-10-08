@@ -4,13 +4,36 @@ class TexasHoldem::Hand
   enum_attr :round, %w( ^pocket flop turn river showdown )
   attr_reader :players, :community_cards
   
-  def initialize(players)
+  def initialize(players,blind_amount=1)
     @players = players
     @deck = TexasHoldem::Deck.new
     @community_cards = []
   end
   
+  def dealer
+    @players.first
+  end
+  
+  def small_blind
+    return dealer if two_player_game?
+    @players[2]
+  end
+  
+  def big_blind
+    return @players.last if two_player_game?
+    @players[1]
+  end
+  
   def winner
+  end
+  
+  def betting_round
+    players.each do |player| 
+      player.place_bet minimum_raise
+    end
+  end
+  
+  def minimum_raise
   end
   
   def deal
@@ -23,6 +46,10 @@ class TexasHoldem::Hand
   end
   
   private
+  
+  def two_player_game?
+    @players.size == 2
+  end
   
   def deal_pocket_cards
     @players.each do |player| 

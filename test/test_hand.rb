@@ -13,7 +13,10 @@ class HandTest < Test::Unit::TestCase
   include TexasHoldem
   
   def setup
-    @hand = Hand.new [Player.new, Player.new]
+    @scotty = Player.new 'Scotty'
+    @doyle = Player.new 'Doyle'
+    @slim = Player.new 'Amarillo Slim'
+    @hand = Hand.new [@scotty, @doyle, @slim]
   end
   
   test "should not have a winner initially" do
@@ -29,6 +32,18 @@ class PocketHandTest < HandTest
   test "first round should deal two cards to all players" do
     @hand.deal
     assert_cards 2, @hand.players
+  end
+  
+  test "should have a dealer" do
+    assert_equal @scotty, @hand.dealer
+  end
+  
+  test "should have a big blind player" do
+    assert_equal @doyle, @hand.big_blind
+  end
+  
+  test "should have a small blind player" do
+    assert_equal @slim, @hand.small_blind
   end
 end
 
@@ -91,3 +106,30 @@ class RiverHandTest < HandTest
     assert_equal 5, @hand.community_cards.size
   end
 end
+
+class TwoPlayerHandTest < HandTest
+  include TexasHoldem
+  
+  def setup
+    super
+    @hand = Hand.new [@scotty, @doyle]
+  end
+  
+  test "should have the dealer as the small blind" do
+    assert_equal @hand.dealer, @scotty
+    assert_equal @hand.small_blind, @scotty
+  end
+  
+  test "should have second player as big blind" do
+    assert_equal @hand.big_blind, @doyle
+  end
+end
+
+class BettingRoundTest < HandTest
+  test "should have a round of betting" do
+    @hand.deal
+    @hand.betting_round
+  end
+end
+
+
