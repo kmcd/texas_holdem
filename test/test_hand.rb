@@ -1,9 +1,11 @@
 require 'helper'
 
-def advance_to_round(number, hand)
-  (number - 1).times do
-    hand.deal
-    hand.round_next
+class TexasHoldem::Hand
+  def advance_to_round(number)
+    (number - 1).times do
+      deal
+      round_next
+    end
   end
 end
 
@@ -33,7 +35,7 @@ end
 class FlopHandTest < HandTest
   def setup
     super
-    advance_to_round 2, @hand
+    @hand.advance_to_round 2
     @hand.deal
   end
   
@@ -53,7 +55,7 @@ end
 class TurnHandTest < HandTest
   def setup
     super
-    advance_to_round 3, @hand
+    @hand.advance_to_round 3
     @hand.deal
   end
   
@@ -73,7 +75,7 @@ end
 class RiverHandTest < HandTest
   def setup
     super
-    advance_to_round 4, @hand
+    @hand.advance_to_round 4
     @hand.deal
   end
   
