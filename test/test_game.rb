@@ -9,15 +9,11 @@ class GameTest < Test::Unit::TestCase
     assert_nil @game.winner
   end
   
-  test "should have a buy-in fee" do
-    assert_equal (@game.entrance_fee * @game.players.size), @game.pot
-  end
-  
   test "should have players" do
     assert_equal [], @game.players
   end
   
-  test "should have small blind as 2.5% of entrance fee" do
-    assert_equal 2.5, @game.small_blind
+  test "should have small blind as 1.25% of entrance fee" do
+    assert_equal 1.25, @game.small_blind
   end
 end

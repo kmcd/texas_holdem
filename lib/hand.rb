@@ -2,12 +2,14 @@ require 'enumerated_attribute'
 
 class TexasHoldem::Hand
   enum_attr :round, %w( ^pocket flop turn river showdown )
-  attr_reader :players, :community_cards
+  attr_reader :players, :community_cards, :pot
   
-  def initialize(players,blind_amount=1)
+  def initialize(players, small_blind_amount=1)
     @players = players
     @deck = TexasHoldem::Deck.new
     @community_cards = []
+    @small_blind_amount = small_blind_amount
+    @pot = 0 # Should this be an Observer?
   end
   
   def dealer
@@ -15,30 +17,29 @@ class TexasHoldem::Hand
   end
   
   def small_blind
-    return dealer if two_player_game?
+    return dealer if players_remaining? 2
     @players[2]
   end
   
   def big_blind
-    return @players.last if two_player_game?
+    return @players.last if players_remaining? 2
     @players[1]
   end
   
   def winner
-  end
-  
-  def betting_round
-    players.each do |player| 
-      player.place_bet minimum_raise
+    if players_remaining? 1
+      @players.first.take_winnings @pot
+      @players.first
     end
   end
   
-  def minimum_raise
+  def fold(player)
+    @players.delete player
   end
   
   def deal
     case round
-      when :pocket : deal_pocket_cards
+      when :pocket : deal_pocket_cards && deduct_blinds
       when :flop   : deal_community_cards 3
       when :turn   : deal_community_cards 1
       when :river  : deal_community_cards 1
@@ -47,8 +48,8 @@ class TexasHoldem::Hand
   
   private
   
-  def two_player_game?
-    @players.size == 2
+  def players_remaining?(number)
+    @players.size == number
   end
   
   def deal_pocket_cards
@@ -59,5 +60,10 @@ class TexasHoldem::Hand
   
   def deal_community_cards(number)
     number.times { @community_cards << @deck.next_card }
+  end
+  
+  def deduct_blinds
+    @pot += small_blind.bet(@small_blind_amount)
+    @pot += big_blind.bet(@small_blind_amount * 2)
   end
 end

@@ -24,6 +24,7 @@ class PlayerTest < Test::Unit::TestCase
   end
   
   test "should NOT bet more than available cash" do
+    # FIXME: treat as all in insead of raising an error
     assert_raises(NotEnoughCashError) do
       @player.bet(101)
     end

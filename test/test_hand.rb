@@ -13,10 +13,11 @@ class HandTest < Test::Unit::TestCase
   include TexasHoldem
   
   def setup
-    @scotty = Player.new 'Scotty'
-    @doyle = Player.new 'Doyle'
-    @slim = Player.new 'Amarillo Slim'
-    @hand = Hand.new [@scotty, @doyle, @slim]
+    # TODO: create a factory for players
+    @scotty = Player.new 'Scotty', 100
+    @doyle = Player.new 'Doyle', 100
+    @slim = Player.new 'Amarillo Slim', 100
+    @hand = Hand.new [@scotty, @doyle, @slim], 1.25
   end
   
   test "should not have a winner initially" do
@@ -47,7 +48,7 @@ class PocketHandTest < HandTest
   end
 end
 
-class FlopHandTest < HandTest
+class FlopTest < HandTest
   def setup
     super
     @hand.advance_to_round 2
@@ -67,7 +68,7 @@ class FlopHandTest < HandTest
   end
 end
 
-class TurnHandTest < HandTest
+class TurnTest < HandTest
   def setup
     super
     @hand.advance_to_round 3
@@ -87,7 +88,7 @@ class TurnHandTest < HandTest
   end
 end
 
-class RiverHandTest < HandTest
+class RiverTest < HandTest
   def setup
     super
     @hand.advance_to_round 4
@@ -126,10 +127,31 @@ class TwoPlayerHandTest < HandTest
 end
 
 class BettingRoundTest < HandTest
-  test "should have a round of betting" do
+  test "should have a winner if everyone else folds" do
     @hand.deal
-    @hand.betting_round
+    @hand.fold @scotty
+    @hand.fold @doyle
+    
+    assert_equal @hand.winner, @slim
+  end
+  
+  test "should automatically deduct blinds after dealing pocket cards" do
+    assert_equal 100, @hand.small_blind.cash
+    assert_equal 100, @hand.big_blind.cash
+    
+    @hand.deal
+    
+    assert @hand.pocket?
+    assert_equal 98.75, @hand.small_blind.cash
+    assert_equal 97.5, @hand.big_blind.cash
+    assert_equal 2.5 + 1.25, @hand.pot
+  end
+  
+  test "should pay out winnings" do
+    @hand.deal
+    @hand.fold @hand.small_blind
+    @hand.fold @hand.big_blind
+    
+    assert_equal 103.75, @hand.winner.cash
   end
 end
-
-

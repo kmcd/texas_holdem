@@ -9,12 +9,14 @@ class TexasHoldem::Player
     @cards = []
   end
   
-  def place_bet(minimum)
-  end
-  
   def bet(amount)
     raise NotEnoughCashError unless enough_cash_for?(amount)
     @cash -= amount
+    amount
+  end
+  
+  def take_winnings(amount)
+    @cash += amount
   end
   
   private
