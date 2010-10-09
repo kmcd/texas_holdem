@@ -16,4 +16,8 @@ class GameTest < Test::Unit::TestCase
   test "should have players" do
     assert_equal [], @game.players
   end
+  
+  test "should have small blind as 2.5% of entrance fee" do
+    assert_equal 2.5, @game.small_blind
+  end
 end
