@@ -1,31 +1,44 @@
 require 'helper'
 
-class TexasHoldem::Hand
-  def advance_to_round(number)
-    (number - 1).times do
-      deal
-      round_next
-    end
-  end
-end
-
-class HandTest < Test::Unit::TestCase
-  include TexasHoldem
-  
-  def setup
-    # TODO: create a factory for players
-    @scotty = Player.new 'Scotty', 100
-    @doyle = Player.new 'Doyle', 100
-    @slim = Player.new 'Amarillo Slim', 100
-    @hand = Hand.new [@scotty, @doyle, @slim], 1.25
-  end
+class HandTest < Test::Unit::TestCase  
+  include HandTestHelper
   
   test "should not have a winner initially" do
     assert_nil @hand.winner
   end
+  
+  test "should have a winner if everyone else folds" do
+    @hand.deal
+    @hand.fold @scotty
+    @hand.fold @doyle
+    
+    assert_equal @hand.winner, @slim
+  end
+                 
+  test "automatically deduct blinds after dealing pocket cards" do
+    assert_equal 100, @hand.small_blind.cash
+    assert_equal 100, @hand.big_blind.cash
+    
+    @hand.deal
+    
+    assert @hand.pocket?
+    assert_equal 98.75, @hand.small_blind.cash
+    assert_equal 97.5, @hand.big_blind.cash
+    assert_equal 2.5 + 1.25, @hand.pot
+  end
+  
+  test "pay out winnings when only one player remains" do
+    @hand.deal
+    @hand.fold @hand.small_blind
+    @hand.fold @hand.big_blind
+    
+    assert_equal 103.75, @hand.winner.cash
+  end
 end
 
-class PocketHandTest < HandTest
+class PocketHandTest < Test::Unit::TestCase  
+  include HandTestHelper
+  
   test "first round should be pocket/hole cards" do
     assert @hand.pocket?
   end
@@ -46,9 +59,11 @@ class PocketHandTest < HandTest
   test "should have a small blind player" do
     assert_equal @slim, @hand.small_blind
   end
-end
+end     
 
-class FlopTest < HandTest
+class FlopTest < Test::Unit::TestCase 
+  include HandTestHelper
+  
   def setup
     super
     @hand.advance_to_round 2
@@ -68,7 +83,9 @@ class FlopTest < HandTest
   end
 end
 
-class TurnTest < HandTest
+class TurnTest < Test::Unit::TestCase 
+  include HandTestHelper
+  
   def setup
     super
     @hand.advance_to_round 3
@@ -87,8 +104,10 @@ class TurnTest < HandTest
     assert_equal 4, @hand.community_cards.size
   end
 end
-
-class RiverTest < HandTest
+                         
+class RiverTest < Test::Unit::TestCase 
+  include HandTestHelper
+  
   def setup
     super
     @hand.advance_to_round 4
@@ -108,50 +127,20 @@ class RiverTest < HandTest
   end
 end
 
-class TwoPlayerHandTest < HandTest
-  include TexasHoldem
+class TwoPlayerHandTest < Test::Unit::TestCase
+  include HandTestHelper
   
   def setup
     super
-    @hand = Hand.new [@scotty, @doyle]
+    @hand = TexasHoldem::Hand.new [@scotty, @doyle]
   end
-  
-  test "should have the dealer as the small blind" do
+                                                              
+  test "should have the dealer as the small blind" do       
     assert_equal @hand.dealer, @scotty
     assert_equal @hand.small_blind, @scotty
-  end
+  end              
   
   test "should have second player as big blind" do
     assert_equal @hand.big_blind, @doyle
-  end
-end
-
-class BettingRoundTest < HandTest
-  test "should have a winner if everyone else folds" do
-    @hand.deal
-    @hand.fold @scotty
-    @hand.fold @doyle
-    
-    assert_equal @hand.winner, @slim
-  end
-  
-  test "should automatically deduct blinds after dealing pocket cards" do
-    assert_equal 100, @hand.small_blind.cash
-    assert_equal 100, @hand.big_blind.cash
-    
-    @hand.deal
-    
-    assert @hand.pocket?
-    assert_equal 98.75, @hand.small_blind.cash
-    assert_equal 97.5, @hand.big_blind.cash
-    assert_equal 2.5 + 1.25, @hand.pot
-  end
-  
-  test "should pay out winnings" do
-    @hand.deal
-    @hand.fold @hand.small_blind
-    @hand.fold @hand.big_blind
-    
-    assert_equal 103.75, @hand.winner.cash
   end
 end

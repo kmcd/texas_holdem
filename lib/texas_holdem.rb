@@ -3,4 +3,5 @@ module TexasHoldem
   require 'hand'
   require 'player'
   require 'deck'
+  require 'betting_round'
 end

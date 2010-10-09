@@ -39,7 +39,7 @@ class TexasHoldem::Hand
   
   def deal
     case round
-      when :pocket : deal_pocket_cards && deduct_blinds
+    when :pocket : deal_pocket_cards && deduct_blinds # Move to BettingRound?
       when :flop   : deal_community_cards 3
       when :turn   : deal_community_cards 1
       when :river  : deal_community_cards 1
