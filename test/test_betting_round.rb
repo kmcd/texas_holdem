@@ -5,7 +5,7 @@ class BettingRoundTest < Test::Unit::TestCase
   
   def setup
     super
-    @betting_round = BettingRound.new [@slim, @scotty, @doyle]      
+    @betting_round = BettingRound.new [@slim, @scotty, @doyle], @hand
     @hand.deal
   end                                    
                              
@@ -29,6 +29,25 @@ class BettingRoundTest < Test::Unit::TestCase
     @betting_round.check @betting_round.next_player
     @betting_round.check @betting_round.next_player
     @betting_round.check @betting_round.next_player
+    assert @betting_round.finished?
+  end
+  
+  test "should finish if all players check or fold" do
+    @betting_round.check @betting_round.next_player
+    @betting_round.check @betting_round.next_player
+    @betting_round.fold @betting_round.next_player
+    assert @betting_round.finished?
+  end
+  
+  test "should remove player from hand if they fold" do
+    player = @betting_round.next_player
+    @betting_round.fold player
+    assert_nil @hand.players.find {|p| p == player }
+  end
+  
+  test "should finish when all fold" do
+    @betting_round.fold @betting_round.next_player
+    @betting_round.fold @betting_round.next_player
     assert @betting_round.finished?
   end
 end                                 
