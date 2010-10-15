@@ -5,9 +5,9 @@ class BettingRoundTest < Test::Unit::TestCase
   
   def setup
     super
-    @minimum_bet = 2.5
-    # TODO: decouple Players by passing in Hand only
-    @betting_round = BettingRound.new [@slim, @scotty, @doyle], @hand, @minimum_bet
+    @minimum_bet = @hand.minimum_bet
+    @slim, @scotty, @doyle = *@hand.players
+    @betting_round = BettingRound.new @hand
     @hand.deal
   end
   

@@ -1,30 +1,37 @@
 class BettingRound
   attr_reader :players
   
-  def initialize(players,hand, minimum_bet)
-    @players, @hand, @minimum_bet = players, hand, minimum_bet
-    @bets, @betting_circle = [], @players.enum_for
-    @players.each {|player| player.add_observer self }
+  def initialize(hand)
+    @hand = hand
+    players.each {|player| player.add_observer self }
   end
   
   def next_player
-    @current_player = @betting_circle.next
+    @current_player = betting_circle.next
     
     rescue StopIteration
-      @betting_circle.rewind
-      @betting_circle.next
+      betting_circle.rewind
+      betting_circle.next
   end
   
   def current_player
     @current_player || next_player
   end
   
-  def pot
-    bets.compact.reduce(:+) || 0
-  end
-  
   def players
     @players ||= @hand.players
+  end
+  
+  def betting_circle
+    @betting_circle ||= @players.enum_for
+  end
+  
+  def minimum_bet
+    @hand.minimum_bet
+  end
+  
+  def pot
+    bets.compact.reduce(:+) || 0
   end
   
   def bets
@@ -52,7 +59,7 @@ class BettingRound
   
   def valid?(bet,player)
     return unless player.eql? current_player
-    bet >= @minimum_bet
+    bet >= minimum_bet
   end
   
   def everyone_bet_equal_amount?
