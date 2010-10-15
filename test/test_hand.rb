@@ -53,15 +53,15 @@ class PocketHandTest < Test::Unit::TestCase
   end
   
   test "should have a dealer" do
-    assert_equal @scotty, @hand.dealer
+    assert_equal @slim, @hand.dealer
   end
   
   test "should have a big blind player" do
-    assert_equal @doyle, @hand.big_blind
+    assert_equal @scotty, @hand.big_blind
   end
   
   test "should have a small blind player" do
-    assert_equal @slim, @hand.small_blind
+    assert_equal @doyle, @hand.small_blind
   end
 end     
 

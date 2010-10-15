@@ -5,8 +5,6 @@ class BettingRoundTest < Test::Unit::TestCase
   
   def setup
     super
-    @minimum_bet = @hand.minimum_bet
-    @slim, @scotty, @doyle = *@hand.players
     @betting_round = BettingRound.new @hand
     @hand.deal
   end
@@ -70,7 +68,7 @@ class BettingRoundTest < Test::Unit::TestCase
   end
   
   test "should have minimum raises equal to big blind" do
-    @slim.bet @minimum_bet - 1
+    @slim.bet @hand.minimum_bet - 1
     assert_equal 0, @betting_round.pot
     assert_current_player @slim
   end

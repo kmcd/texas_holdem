@@ -40,6 +40,6 @@ end
 module HandTestHelper 
   def setup
     @hand = TexasHoldem::Hand.factory
-    @scotty, @doyle, @slim = *@hand.players
+    @slim, @scotty, @doyle = *@hand.players
   end
 end
