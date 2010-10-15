@@ -1,17 +1,15 @@
 class BettingRound
-  attr_reader :players
-  
   def initialize(hand)
     @hand = hand
+    @betting_circle = players.enum_for
     players.each {|player| player.add_observer self }
   end
   
   def next_player
-    @current_player = betting_circle.next
-    
+    @current_player = @betting_circle.next
     rescue StopIteration
-      betting_circle.rewind
-      betting_circle.next
+      @betting_circle.rewind
+      retry
   end
   
   def current_player
@@ -22,12 +20,8 @@ class BettingRound
     @players ||= @hand.players
   end
   
-  def betting_circle
-    @betting_circle ||= @players.enum_for
-  end
-  
   def minimum_bet
-    @hand.minimum_bet
+    bets.last || @hand.minimum_bet
   end
   
   def pot
@@ -40,7 +34,7 @@ class BettingRound
   
   def finished?
     return true if only_one_player_remaining?
-    all_remaining_bets_checked? || everyone_bet_equal_amount?
+    all_remaining_bets_checked? || everyone_bet_equal_amount? 
   end
   
   def update(args)
@@ -65,16 +59,16 @@ class BettingRound
   def everyone_bet_equal_amount?
     remaining_players_last_bets.uniq.size == 1
   end
-  
+    
   def all_remaining_bets_checked?
     remaining_players_last_bets.all? {|bet| bet.nil? }
   end
   
   def remaining_players_last_bets
-    bets[-@players.size..-1] || []
+    bets[-players.size..-1] || []
   end
   
   def only_one_player_remaining?
-    @players.size == 1
+    players.size == 1
   end
 end

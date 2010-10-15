@@ -15,8 +15,8 @@ class Test::Unit::TestCase
 end
 
 class TexasHoldem::Hand
-  def self.factory(number_of_players=3, small_blind=1.25)
-    players = TexasHoldem::Player.factory number_of_players
+  def self.factory(small_blind=1.25)
+    players = %w( Slim Scotty Doyle ).map {|name| TexasHoldem::Player.factory name }
     new players, small_blind
   end
   
@@ -29,11 +29,8 @@ class TexasHoldem::Hand
 end
 
 class TexasHoldem::Player
-  def self.factory(number,cash=100)
-    players = []
-    # TODO: add players with meaningful names, eg Doyle, Scotty
-    number.times { players << new('player', cash) }
-    players
+  def self.factory(name, cash=100)
+    new name, cash
   end
 end
 

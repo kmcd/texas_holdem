@@ -23,6 +23,8 @@ class BettingRoundTest < Test::Unit::TestCase
     assert_current_player @scotty
     @betting_round.next_player
     assert_current_player @doyle
+    @betting_round.next_player
+    assert_current_player @slim
   end
   
   test "should add bets to the pot" do
@@ -73,8 +75,29 @@ class BettingRoundTest < Test::Unit::TestCase
     assert_current_player @slim
   end
   
-  test "betting finishes when everyone has put in same amount" do
+  test "betting finishes when everyone puts in same amount" do
     @betting_round.players.each {|player| player.bet 10 }
+    assert @betting_round.finished?
+  end
+  
+  test "should calculate minimum bet for current player" do
+    @slim.bet 20
+    assert_equal @betting_round.minimum_bet, 20
+    @scotty.bet 30
+    assert_equal @betting_round.minimum_bet, 30
+    @doyle.bet 40
+    assert_equal @betting_round.minimum_bet, 10
+  end
+  
+  
+  test "betting finishes when everyone matches amount previously put in" do
+    @slim.bet 20
+    @scotty.bet 30
+    @doyle.bet 40
+    assert !@betting_round.finished?
+    @slim.bet 20
+    assert !@betting_round.finished?
+    @scotty.bet 10
     assert @betting_round.finished?
   end
 end
