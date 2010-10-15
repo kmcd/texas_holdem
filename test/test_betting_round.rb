@@ -6,67 +6,78 @@ class BettingRoundTest < Test::Unit::TestCase
   def setup
     super
     @minimum_bet = 2.5
+    # TODO: decouple Players by passing in Hand only
     @betting_round = BettingRound.new [@slim, @scotty, @doyle], @hand, @minimum_bet
     @hand.deal
-  end                                    
+  end
+  
+  def assert_current_player(player)
+    assert_equal player, @betting_round.current_player
+  end
                              
   test "player to the left of big blind is first to bet" do
-    assert_equal @slim, @betting_round.next_player
-  end                            
+    assert_current_player @slim
+  end
   
   test "play continues clockwise around the table" do
-    assert_equal @slim, @betting_round.next_player
-    assert_equal @scotty, @betting_round.next_player
-    assert_equal @doyle, @betting_round.next_player 
-    assert_equal @slim, @betting_round.next_player
+    assert_current_player @slim
+    @betting_round.next_player
+    assert_current_player @scotty
+    @betting_round.next_player
+    assert_current_player @doyle
   end
   
-  test "betting continues clockwise around the table" do
-    assert_equal @slim, @betting_round.current_player
-    @betting_round.raise 20
-    assert_equal @scotty, @betting_round.current_player
-    @betting_round.raise 20
-    assert_equal @doyle, @betting_round.current_player
-  end
-  
-  test "should add raise to the pot" do
-    @betting_round.raise 20
+  test "should add bets to the pot" do
+    @slim.bet 20
     assert_equal 20, @betting_round.pot
+    @scotty.bet 20
+    assert_equal 40, @betting_round.pot
+    @doyle.bet 20
+    assert_equal 60, @betting_round.pot
   end
-                              
+  
+  test "should only accept bet from current player" do
+    assert_current_player @slim
+    @doyle.bet 20
+    assert_equal 0, @betting_round.pot
+    assert_current_player @slim
+  end
+  
   test "should finish if all players check" do
-    @betting_round.check
-    @betting_round.check 
-    @betting_round.check
+    @slim.check
+    @scotty.check
+    @doyle.check
     assert @betting_round.finished?
   end
   
   test "should finish if all players check or fold" do
-    @betting_round.check 
-    @betting_round.check
-    @betting_round.fold
+    @slim.check 
+    @scotty.check
+    @doyle.fold
     assert @betting_round.finished?
   end
   
   test "should remove player from hand if they fold" do
     player = @betting_round.current_player
-    @betting_round.fold
+    player.fold
     assert_nil @hand.players.find {|p| p == player }
   end
   
   test "should finish when all but one fold" do
-    @betting_round.fold
-    @betting_round.fold
+    @betting_round.current_player.fold
+    @betting_round.current_player.fold
     assert @betting_round.finished?
+    # TODO: should have a hand winner
   end
   
-  test "should have minimum raise equal to big blind" do
-    assert_block { @betting_round.raise(@minimum_bet) }
-    assert_nil @betting_round.raise(@minimum_bet - 1)
+  test "should have minimum raises equal to big blind" do
+    @slim.bet @minimum_bet - 1
+    assert_equal 0, @betting_round.pot
+    assert_current_player @slim
   end
   
-  test "betting finishes when everyone has put in equal amount" do
-    @betting_round.players.size.times { @betting_round.raise 20 }
+  test "betting finishes when everyone has put in same amount" do
+    @betting_round.players.each {|player| player.bet 10 }
     assert @betting_round.finished?
   end
 end

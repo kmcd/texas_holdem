@@ -31,6 +31,7 @@ end
 class TexasHoldem::Player
   def self.factory(number,cash=100)
     players = []
+    # TODO: add players with meaningful names, eg Doyle, Scotty
     number.times { players << new('player', cash) }
     players
   end

@@ -4,6 +4,7 @@ class BettingRound
   def initialize(players,hand, minimum_bet)
     @players, @hand, @minimum_bet = players, hand, minimum_bet
     @bets, @betting_circle = [], @players.enum_for
+    @players.each {|player| player.add_observer self }
   end
   
   def next_player
@@ -14,25 +15,12 @@ class BettingRound
       @betting_circle.next
   end
   
-  def check
-    @bets << nil
-    next_player
-  end
-  
-  def raise(amount)
-    return if amount < @minimum_bet
-    @bets << amount
-    next_player
+  def current_player
+    @current_player || next_player
   end
   
   def pot
-    @bets.compact.reduce :+
-  end
-  
-  def fold
-    @players.delete current_player
-    @hand.fold current_player # TODO: use an Observer instead?
-    next_player
+    @bets.compact.reduce(:+) || 0
   end
   
   def finished?
@@ -40,11 +28,24 @@ class BettingRound
     all_remaining_bets_checked? || everyone_bet_equal_amount?
   end
   
-  def current_player
-    @current_player || next_player
+  def update(args)
+    if args[:fold]
+      @players.delete current_player
+      @hand.fold current_player
+    else
+      bet, player = args[:bet][:amount], args[:bet][:player] 
+      return unless valid? bet, player
+      @bets << bet
+    end
+    next_player
   end
   
   private
+  
+  def valid?(bet,player)
+    return unless player.eql? current_player
+    bet >= @minimum_bet
+  end
   
   def everyone_bet_equal_amount?
     remaining_players_last_bets.uniq.size == 1
@@ -55,7 +56,7 @@ class BettingRound
   end
   
   def remaining_players_last_bets
-    @bets[-@players.size..-1]
+    @bets[-@players.size..-1] || []
   end
   
   def only_one_player_remaining?
