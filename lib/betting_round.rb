@@ -20,31 +20,31 @@ class BettingRound
     @players ||= @hand.players
   end
   
-  def minimum_bet
-    bets.last || @hand.minimum_bet
-  end
-  
-  def pot
-    bets.compact.reduce(:+) || 0
-  end
-  
   def bets
-    @bets ||= []
+    @bets ||= Hash.new(0)
+  end
+  
+  def minimum_bet
+    bets.values.empty? ? @hand.minimum_bet : amount_to_match_pot
+  end
+  
+  # TODO: move to Hand, update with Observer
+  def pot
+    bets.values.compact.reduce(:+) || 0
   end
   
   def finished?
-    return true if only_one_player_remaining?
-    all_remaining_bets_checked? || everyone_bet_equal_amount? 
+    players.size == 1 || everyone_bet_equal_amount? 
   end
   
   def update(args)
     if args[:fold]
-      @players.delete current_player
+      players.delete current_player
       @hand.fold current_player
     else
       bet, player = args[:bet][:amount], args[:bet][:player] 
       return unless valid? bet, player
-      bets << bet
+      bets[player] += bet
     end
     next_player
   end
@@ -53,22 +53,14 @@ class BettingRound
   
   def valid?(bet,player)
     return unless player.eql? current_player
-    bet >= minimum_bet
+    bet >= minimum_bet || bet == 0
   end
   
   def everyone_bet_equal_amount?
-    remaining_players_last_bets.uniq.size == 1
-  end
-    
-  def all_remaining_bets_checked?
-    remaining_players_last_bets.all? {|bet| bet.nil? }
+    bets.values.uniq.size == 1
   end
   
-  def remaining_players_last_bets
-    bets[-players.size..-1] || []
-  end
-  
-  def only_one_player_remaining?
-    players.size == 1
+  def amount_to_match_pot
+    bets.values.max - bets[current_player]
   end
 end

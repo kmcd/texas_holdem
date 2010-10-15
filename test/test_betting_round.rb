@@ -44,9 +44,7 @@ class BettingRoundTest < Test::Unit::TestCase
   end
   
   test "should finish if all players check" do
-    @slim.check
-    @scotty.check
-    @doyle.check
+    @betting_round.players.each {|player| player.check }
     assert @betting_round.finished?
   end
   
@@ -82,11 +80,22 @@ class BettingRoundTest < Test::Unit::TestCase
   
   test "should calculate minimum bet for current player" do
     @slim.bet 20
+    
+    assert_current_player @scotty
     assert_equal @betting_round.minimum_bet, 20
     @scotty.bet 30
+    
+    assert_current_player @doyle
     assert_equal @betting_round.minimum_bet, 30
     @doyle.bet 40
+    
+    assert_current_player @slim
+    assert_equal @betting_round.minimum_bet, 20
+    @slim.bet 20
+    
+    assert_current_player @scotty
     assert_equal @betting_round.minimum_bet, 10
+    @scotty.bet 10
   end
   
   
