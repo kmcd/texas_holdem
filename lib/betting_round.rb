@@ -20,7 +20,15 @@ class BettingRound
   end
   
   def pot
-    @bets.compact.reduce(:+) || 0
+    bets.compact.reduce(:+) || 0
+  end
+  
+  def players
+    @players ||= @hand.players
+  end
+  
+  def bets
+    @bets ||= []
   end
   
   def finished?
@@ -35,7 +43,7 @@ class BettingRound
     else
       bet, player = args[:bet][:amount], args[:bet][:player] 
       return unless valid? bet, player
-      @bets << bet
+      bets << bet
     end
     next_player
   end
@@ -56,7 +64,7 @@ class BettingRound
   end
   
   def remaining_players_last_bets
-    @bets[-@players.size..-1] || []
+    bets[-@players.size..-1] || []
   end
   
   def only_one_player_remaining?

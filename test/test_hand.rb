@@ -34,6 +34,10 @@ class HandTest < Test::Unit::TestCase
     
     assert_equal 103.75, @hand.winner.cash
   end
+  
+  test "minimum bet is double the small blind" do
+    assert_equal 2.5, @hand.minimum_bet
+  end
 end
 
 class PocketHandTest < Test::Unit::TestCase  

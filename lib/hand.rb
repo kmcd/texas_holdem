@@ -16,6 +16,10 @@ class TexasHoldem::Hand
     @players.first
   end
   
+  def minimum_bet
+    @small_blind_amount * 2
+  end
+  
   def small_blind
     return dealer if players_remaining? 2
     @players[2]

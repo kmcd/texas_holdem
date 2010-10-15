@@ -64,10 +64,9 @@ class BettingRoundTest < Test::Unit::TestCase
   end
   
   test "should finish when all but one fold" do
-    @betting_round.current_player.fold
-    @betting_round.current_player.fold
+    @slim.fold
+    @doyle.fold
     assert @betting_round.finished?
-    # TODO: should have a hand winner
   end
   
   test "should have minimum raises equal to big blind" do
