@@ -28,6 +28,10 @@ class BettingRound
     bets.values.empty? ? @hand.minimum_bet : amount_to_match_pot
   end
   
+  def minimum_raise
+    minimum_bet + @hand.minimum_bet
+  end
+  
   # TODO: move to Hand, update with Observer
   def pot
     bets.values.compact.reduce(:+) || 0
@@ -53,7 +57,7 @@ class BettingRound
   
   def valid?(bet,player)
     return unless player.eql? current_player
-    bet >= minimum_bet || bet == 0
+    bet == minimum_bet || bet >= minimum_raise || bet == 0
   end
   
   def everyone_bet_equal_amount?

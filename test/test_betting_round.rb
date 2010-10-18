@@ -49,7 +49,7 @@ class BettingRoundTest < Test::Unit::TestCase
   end
   
   test "should finish if all players check or fold" do
-    @slim.check 
+    @slim.check
     @scotty.check
     @doyle.fold
     assert @betting_round.finished?
@@ -108,5 +108,17 @@ class BettingRoundTest < Test::Unit::TestCase
     assert !@betting_round.finished?
     @scotty.bet 10
     assert @betting_round.finished?
+  end
+  
+  test "should enforce (big blind) minumim bet raise" do
+    @slim.bet 10
+    assert_equal 10, @betting_round.minimum_bet
+    assert_equal 12.5, @betting_round.minimum_raise
+    
+    @scotty.bet 12
+    assert_current_player @scotty
+    
+    @scotty.bet 12.5
+    assert_current_player @doyle
   end
 end
