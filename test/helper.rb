@@ -15,6 +15,19 @@ class Test::Unit::TestCase
   end
 end
 
+class String
+  include Test::Unit::Assertions
+  
+  def hand_name(name)
+    assert_equal name, TexasHoldem::PlayersHand.new(self).name
+  end
+  
+  def beats(loser)
+    winner, loser = TexasHoldem::PlayersHand.new(self), TexasHoldem::PlayersHand.new(loser)
+    assert( winner > loser )
+  end
+end
+
 class TexasHoldem::Hand
   def self.factory(small_blind=1.25)
     players = %w( Slim Scotty Doyle ).map {|name| TexasHoldem::Player.factory name }
