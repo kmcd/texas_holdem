@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'test/unit'
 require 'active_support/testing/declarative'
+require 'mocha'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -34,7 +35,7 @@ class TexasHoldem::Player
   end
 end
 
-module HandTestHelper 
+module HandTestHelper
   def setup
     @hand = TexasHoldem::Hand.factory
     @slim, @scotty, @doyle = *@hand.players

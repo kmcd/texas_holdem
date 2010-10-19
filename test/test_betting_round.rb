@@ -27,19 +27,19 @@ class BettingRoundTest < Test::Unit::TestCase
     assert_current_player @slim
   end
   
-  test "should add bets to the pot" do
+  test "should track amount bet" do
     @slim.bet 20
-    assert_equal 20, @betting_round.pot
+    assert_equal 20, @betting_round.amount_bet
     @scotty.bet 20
-    assert_equal 40, @betting_round.pot
+    assert_equal 40, @betting_round.amount_bet
     @doyle.bet 20
-    assert_equal 60, @betting_round.pot
+    assert_equal 60, @betting_round.amount_bet
   end
   
   test "should only accept bet from current player" do
     assert_current_player @slim
     @doyle.bet 20
-    assert_equal 0, @betting_round.pot
+    assert_equal 0, @betting_round.amount_bet
     assert_current_player @slim
   end
   
@@ -69,7 +69,7 @@ class BettingRoundTest < Test::Unit::TestCase
   
   test "should have minimum raises equal to big blind" do
     @slim.bet @hand.minimum_bet - 1
-    assert_equal 0, @betting_round.pot
+    assert_equal 0, @betting_round.amount_bet
     assert_current_player @slim
   end
   
@@ -98,7 +98,6 @@ class BettingRoundTest < Test::Unit::TestCase
     @scotty.bet 10
   end
   
-  
   test "betting finishes when everyone matches amount previously put in" do
     @slim.bet 20
     @scotty.bet 30
@@ -120,5 +119,13 @@ class BettingRoundTest < Test::Unit::TestCase
     
     @scotty.bet 12.5
     assert_current_player @doyle
+  end
+  
+  test "should add bets to the pot" do
+    @slim.bet 20
+    @scotty.bet 20
+    @doyle.bet 20
+    blinds = 3.75
+    assert_equal 60 + blinds, @hand.pot 
   end
 end

@@ -16,4 +16,15 @@ class GameTest < Test::Unit::TestCase
   test "should have small blind as 1.25% of entrance fee" do
     assert_equal 1.25, @game.small_blind
   end
+  
+  test "should know when finshed" do
+    @game.stubs(:players).returns [TexasHoldem::Player.new('Foo', 100)]
+    assert_equal true, @game.finished?
+  end
+  
+  test "should have a winner when finished" do
+    winner = TexasHoldem::Player.new 'Foo', 100
+    @game.stubs(:players).returns [winner]
+    assert_equal winner, @game.winner
+  end
 end

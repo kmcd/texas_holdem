@@ -6,7 +6,12 @@ class TexasHoldem::Game
     @players, @entrance_fee = players, entrance_fee
   end
   
+  def finished?
+    players.size == 1
+  end
+  
   def winner
+    players.first if finished?
   end
   
   def small_blind

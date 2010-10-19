@@ -2,7 +2,8 @@ require 'enumerated_attribute'
 
 class TexasHoldem::Hand
   enum_attr :round, %w( ^pocket flop turn river showdown )
-  attr_reader :players, :community_cards, :pot
+  attr_reader :players, :community_cards
+  attr_accessor :pot
   
   def initialize(players, small_blind_amount=1)
     @players = players
@@ -31,10 +32,14 @@ class TexasHoldem::Hand
   end
   
   def winner
-    if players_remaining? 1
+    if finished?
       @players.first.take_winnings @pot
       @players.first
     end
+  end
+  
+  def finished?
+    players_remaining? 1
   end
   
   def fold(player)
@@ -43,7 +48,7 @@ class TexasHoldem::Hand
   
   def deal
     case round
-    when :pocket : deal_pocket_cards && deduct_blinds # Move to BettingRound?
+      when :pocket : deal_pocket_cards && deduct_blinds # Move to BettingRound?
       when :flop   : deal_community_cards 3
       when :turn   : deal_community_cards 1
       when :river  : deal_community_cards 1

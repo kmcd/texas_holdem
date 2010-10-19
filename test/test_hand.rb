@@ -27,6 +27,14 @@ class HandTest < Test::Unit::TestCase
     assert_equal 2.5 + 1.25, @hand.pot
   end
   
+  test "should know when finished" do
+    @hand.deal
+    @hand.fold @scotty
+    @hand.fold @doyle
+    
+    assert_equal true, @hand.finished?
+  end
+  
   test "pay out winnings when only one player remains" do
     @hand.deal
     @hand.fold @hand.small_blind

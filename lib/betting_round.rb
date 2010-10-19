@@ -32,8 +32,7 @@ class BettingRound
     minimum_bet + @hand.minimum_bet
   end
   
-  # TODO: move to Hand, update with Observer
-  def pot
+  def amount_bet
     bets.values.compact.reduce(:+) || 0
   end
   
@@ -49,6 +48,7 @@ class BettingRound
       bet, player = args[:bet][:amount], args[:bet][:player] 
       return unless valid? bet, player
       bets[player] += bet
+      @hand.pot += bet
     end
     next_player
   end
