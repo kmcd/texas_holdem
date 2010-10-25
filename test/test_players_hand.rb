@@ -16,6 +16,12 @@ class HandIdentificationTest < Test::Unit::TestCase
   test "should recognise a straight" do
     '2d 3s 4h 5d 6d'.hand_name 'straight'
   end
+  
+  test "should recognise a full house" do
+    '2d 2s 2h 4d 4c'.hand_name 'full house'
+    # '2d 2s 4h 4d 4c'.hand_name 'full house'
+    # '2d 4s 2h 4d 4c'.hand_name 'full house'
+  end
 end
 
 class WinningHandsTest < Test::Unit::TestCase
@@ -27,7 +33,7 @@ class WinningHandsTest < Test::Unit::TestCase
     '2d 2s 5c 6c Ad'.beats '2c 3d 5s 6h Kd'
   end
   
-  test "high pair low pair" do
+  test "high pair beats low pair" do
     'Ad As 5c 6c Jd'.beats 'Kc Kd 5s 6h Qd'
   end
   
@@ -35,11 +41,11 @@ class WinningHandsTest < Test::Unit::TestCase
     'Ad As 5c 6c Kd'.beats 'Ac Ad 5s 6h Qd'
   end
   
-  test "two pair a pair" do
+  test "two pair beats a pair" do
     'Ad As 5c 5d Kd'.beats 'Ac Ad 5s 6h Qd'
   end
   
-  test "three of a kind two pair" do
+  test "three of a kind beats two pair" do
     'Ad As Ac 5d Kd'.beats 'Kc Kd 5s 5h Qd'
   end
 end
