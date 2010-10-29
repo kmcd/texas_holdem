@@ -39,9 +39,15 @@ class TexasHoldem::PlayersHand
       'one pair'
     elsif straight?
       'straight'
+    elsif flush?
+      'flush'
     else
       'high card'
     end
+  end
+  
+  def flush?
+    @cards.match /\d{1,2}([csdh]) (?:\s\d{1,2}\1){4} /x
   end
   
   def straight?
@@ -81,6 +87,7 @@ class TexasHoldem::PlayersHand
       when /two pair/ : 2
       when /three/    : 3
       when /straight/ : 4
+      when /flush/    : 5
     else
       0
     end * 1000
@@ -92,6 +99,7 @@ class TexasHoldem::PlayersHand
       when /two pair/ : @cards[MATCHES['two pair'],2].to_i * 2
       when /three/    : @cards[MATCHES['three of a kind'],1].to_i * 3
       when /straight/ : face_values.split.last.to_i
+      when /flush/    : face_values.split.sort.last.to_i
     else
       0
     end

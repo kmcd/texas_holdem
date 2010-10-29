@@ -32,6 +32,10 @@ class HandIdentificationTest < Test::Unit::TestCase
     '2d 2s 4h 4d 4c'.hand_name 'full house'
     '2d 4s 2h 4d 4c'.hand_name 'full house'
   end
+  
+  test "should recognise a flush" do
+    '2h 3h 4h 5h 7h'.hand_name 'flush'
+  end
 end
 
 class WinningHandsTest < Test::Unit::TestCase
@@ -75,5 +79,13 @@ class WinningHandsTest < Test::Unit::TestCase
   test "higher stright beats lower straight" do
     '3c 4h 5s 6d 7d'.beats '2d 3c 4h 5s 6d'
     '10c Jd Qs Kd As'.beats '9h 10c Jd Qs Kd'
+  end
+  
+  test "flush beats a straight" do
+    '2h 3h 4h 5h 7h'.beats '9h 10c Jd Qs Kd'
+  end
+  
+  test "high card determines winner of flushes" do
+    '2h 3h 4h 5h 8h'.beats '2d 3d 4d 5d 7d'
   end
 end
