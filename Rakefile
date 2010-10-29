@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "texas_holdem"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Ruby classes modelling a game Texas Holdem poker}
+    gem.description = %Q{Ruby classes modelling a game Texas Holdem poker}
     gem.email = "keith@dancingtext.com"
     gem.homepage = "http://github.com/kmcd/texas_holdem"
     gem.authors = ["Keith McDonnell"]
@@ -22,19 +22,6 @@ Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
   test.pattern = 'test/**/test_*.rb'
   test.verbose = true
-end
-
-begin
-  require 'rcov/rcovtask'
-  Rcov::RcovTask.new do |test|
-    test.libs << 'test'
-    test.pattern = 'test/**/test_*.rb'
-    test.verbose = true
-  end
-rescue LoadError
-  task :rcov do
-    abort "RCov is not available. In order to run rcov, you must: sudo gem install spicycode-rcov"
-  end
 end
 
 task :test => :check_dependencies
