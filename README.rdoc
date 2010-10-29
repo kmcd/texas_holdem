@@ -1,6 +1,6 @@
 = texas_holdem
 
-Description goes here.
+Ruby classes modelling a game Texas Holdem poker
 
 == Note on Patches/Pull Requests
  
