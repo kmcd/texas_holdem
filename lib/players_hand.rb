@@ -50,10 +50,6 @@ class TexasHoldem::PlayersHand
     end
   end
   
-  def high_card?
-    name == 'high card'
-  end
-  
   def one_pair?
     @cards.match MATCHES['one pair']
   end
