@@ -1,6 +1,15 @@
 require 'helper'
 
+class HandTest < Test::Unit::TestCase
+  test "should always have cards sorted in ascending order by face value" do
+    hand = TexasHoldem::PlayersHand.new('Ad As 5c 6c Jd')
+    assert_equal  "5c 6c 11d 14s 14d", hand.cards
+  end
+end
+
 class HandIdentificationTest < Test::Unit::TestCase
+  # TODO: add more non-sequential matches
+  
   test "should recognise a pair" do
     '2d 2s 5c 6c Ad'.hand_name 'one pair'
   end
@@ -19,8 +28,8 @@ class HandIdentificationTest < Test::Unit::TestCase
   
   test "should recognise a full house" do
     '2d 2s 2h 4d 4c'.hand_name 'full house'
-    # '2d 2s 4h 4d 4c'.hand_name 'full house'
-    # '2d 4s 2h 4d 4c'.hand_name 'full house'
+    '2d 2s 4h 4d 4c'.hand_name 'full house'
+    '2d 4s 2h 4d 4c'.hand_name 'full house'
   end
 end
 
