@@ -24,6 +24,7 @@ class HandIdentificationTest < Test::Unit::TestCase
   
   test "should recognise a straight" do
     '2d 3s 4h 5d 6d'.hand_name 'straight'
+    '10c Jd Qs Kd As'.hand_name 'straight'
   end
   
   test "should recognise a full house" do
@@ -54,7 +55,25 @@ class WinningHandsTest < Test::Unit::TestCase
     'Ad As 5c 5d Kd'.beats 'Ac Ad 5s 6h Qd'
   end
   
+  test "highest pair wins if both two pairs" do
+    '2d 2s 4c 4d Kd'.beats '2c 2d 3s 3h Qd'
+    'Ad As 4c 4d Kd'.beats 'Kc Kd Qs Qh Jd'
+  end
+  
+  test "highest card wins if both hands have identincal two pairs" do
+    '2d 2s 4c 4d 6d'.beats '2d 2s 4c 4d 5d'
+  end
+  
   test "three of a kind beats two pair" do
     'Ad As Ac 5d Kd'.beats 'Kc Kd 5s 5h Qd'
+  end
+  
+  test "stright beats three of a kind" do
+    '2d 3c 4h 5s 6d'.beats 'Ad As Ac 5d Kd'
+  end
+  
+  test "higher stright beats lower straight" do
+    '3c 4h 5s 6d 7d'.beats '2d 3c 4h 5s 6d'
+    '10c Jd Qs Kd As'.beats '9h 10c Jd Qs Kd'
   end
 end

@@ -7,9 +7,6 @@ class TexasHoldem::PlayersHand
     'one pair'        => /(\d{1,2})[scdh] \1[scdh]/, 
     'two pair'        => /(\d{1,2})[scdh] \1[scdh].*(\d{1,2})[scdh] \2[scdh]/,
     'three of a kind' => /(\d{1,2})[scdh] \1[scdh] \1[scdh]/,
-    # OK, this is a bit crazy but straights are the hardest to match
-    # It works by building all combinations of possible straights 
-    'straight'        => Regexp.new( (0..8).map {|s| (2..14).to_a[ s..s+4 ].join ' ' }.map {|s| s.gsub /(\d{1,2})/,'\1[scdh]' }.join('|').sub(/^/,'(').sub(/$/,')') ),
     'full house'      => /^(?:(\d) \1{2} (\d) \2|(\d) \3 (\d) \4{2})/x
   }
 
@@ -31,6 +28,7 @@ class TexasHoldem::PlayersHand
   end
   
   def name
+    # TODO: refactor to polymorphic type?
     if full_house?   
       'full house'
     elsif three_of_a_kind?
@@ -47,8 +45,8 @@ class TexasHoldem::PlayersHand
   end
   
   def straight?
-    # TODO: refactor this (can use a range finder now we're in a method)
-    @cards.match MATCHES['straight']
+    card_sequence = face_values.split.map {|d| d.to_i }
+    (card_sequence.first..card_sequence.last).to_a == card_sequence
   end           
   
   def one_pair?
@@ -82,6 +80,7 @@ class TexasHoldem::PlayersHand
       when /one pair/ : 1
       when /two pair/ : 2
       when /three/    : 3
+      when /straight/ : 4
     else
       0
     end * 1000
@@ -90,8 +89,9 @@ class TexasHoldem::PlayersHand
   def relative_score
     case name
       when /one pair/ : @cards[MATCHES['one pair'],1].to_i * 2
-      when /two pair/ : @cards[MATCHES['two pair'],2].to_i * 2 + @cards[MATCHES['two pair'],2].to_i * 2
+      when /two pair/ : @cards[MATCHES['two pair'],2].to_i * 2
       when /three/    : @cards[MATCHES['three of a kind'],1].to_i * 3
+      when /straight/ : face_values.split.last.to_i
     else
       0
     end
@@ -105,5 +105,11 @@ class TexasHoldem::PlayersHand
       else
         ''
     end.gsub /[a-z]/, ''
+  end
+  
+  private
+  
+  def face_values
+    @cards.gsub(/[scdh]/,'')
   end
 end

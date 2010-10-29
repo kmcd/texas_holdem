@@ -68,7 +68,6 @@ class #{class_name}Test < Test::Unit::TestCase
     flunk
   end
 end}
-
 end
 
 def write_to(local_filename,text)

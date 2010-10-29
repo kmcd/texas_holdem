@@ -3,6 +3,7 @@ require 'test/unit'
 require 'active_support/testing/declarative'
 require 'mocha'
 
+# TODO: create a rake task to load irb environment
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'texas_holdem'
