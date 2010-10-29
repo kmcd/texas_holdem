@@ -1,4 +1,8 @@
+require 'timeout'
+
 class BettingRound
+  attr_accessor :max_wait_time_for_bet
+  
   def initialize(hand)
     @hand = hand
     @betting_circle = players.enum_for
@@ -8,8 +12,13 @@ class BettingRound
   def next_player
     @current_player = @betting_circle.next
     rescue StopIteration
-      @betting_circle.rewind
-      retry
+      @betting_circle.rewind and retry
+  end
+  
+  def max_wait_time_for_bet(seconds)
+    Timeout::timeout(seconds) { yield }
+    rescue Timeout::Error
+      fold @current_player and next_player
   end
   
   def current_player
@@ -42,8 +51,7 @@ class BettingRound
   
   def update(args)
     if args[:fold]
-      players.delete current_player
-      @hand.fold current_player
+      fold @current_player
     else
       bet, player = args[:bet][:amount], args[:bet][:player] 
       return unless valid? bet, player
@@ -66,5 +74,10 @@ class BettingRound
   
   def amount_to_match_pot
     bets.values.max - bets[current_player]
+  end
+  
+  def fold(player)
+    players.delete player
+    @hand.fold player
   end
 end

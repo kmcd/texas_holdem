@@ -128,4 +128,13 @@ class BettingRoundTest < Test::Unit::TestCase
     blinds = 3.75
     assert_equal 60 + blinds, @hand.pot 
   end
+  
+  test "should kick player out of the hand if they take too long to bet" do
+    @betting_round.max_wait_time_for_bet(0.09) do
+      assert_current_player @slim
+      sleep 0.1
+      assert !@betting_round.players.include?(@slim)
+      assert_current_player @scotty
+    end
+  end
 end
