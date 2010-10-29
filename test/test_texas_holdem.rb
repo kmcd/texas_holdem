@@ -4,5 +4,6 @@ class TexasHoldemTest < Test::Unit::TestCase
   def setup
   end
   
-  # TODO: Example end to end games here
+  test "should have end to end tests here" do
+  end
 end

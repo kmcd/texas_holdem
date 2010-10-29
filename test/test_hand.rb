@@ -9,10 +9,10 @@ class HandTest < Test::Unit::TestCase
   
   test "should have a winner if everyone else folds" do
     @hand.deal
-    @hand.fold @scotty
-    @hand.fold @doyle
+    @hand.fold @bill
+    @hand.fold @carl
     
-    assert_equal @hand.winner, @slim
+    assert_equal @hand.winner, @amy
   end
                  
   test "automatically deduct blinds after dealing pocket cards" do
@@ -29,8 +29,8 @@ class HandTest < Test::Unit::TestCase
   
   test "should know when finished" do
     @hand.deal
-    @hand.fold @scotty
-    @hand.fold @doyle
+    @hand.fold @bill
+    @hand.fold @carl
     
     assert_equal true, @hand.finished?
   end
@@ -61,15 +61,15 @@ class PocketHandTest < Test::Unit::TestCase
   end
   
   test "should have a dealer" do
-    assert_equal @slim, @hand.dealer
+    assert_equal @amy, @hand.dealer
   end
   
   test "should have a big blind player" do
-    assert_equal @scotty, @hand.big_blind
+    assert_equal @bill, @hand.big_blind
   end
   
   test "should have a small blind player" do
-    assert_equal @doyle, @hand.small_blind
+    assert_equal @carl, @hand.small_blind
   end
 end     
 
@@ -144,15 +144,15 @@ class TwoPlayerHandTest < Test::Unit::TestCase
   
   def setup
     super
-    @hand = TexasHoldem::Hand.new [@scotty, @doyle]
+    @hand = TexasHoldem::Hand.new [@bill, @carl]
   end
                                                               
   test "should have the dealer as the small blind" do       
-    assert_equal @hand.dealer, @scotty
-    assert_equal @hand.small_blind, @scotty
+    assert_equal @hand.dealer, @bill
+    assert_equal @hand.small_blind, @bill
   end              
   
   test "should have second player as big blind" do
-    assert_equal @hand.big_blind, @doyle
+    assert_equal @hand.big_blind, @carl
   end
 end

@@ -31,7 +31,7 @@ end
 
 class TexasHoldem::Hand
   def self.factory(small_blind=1.25)
-    players = %w( Slim Scotty Doyle ).map {|name| TexasHoldem::Player.factory name }
+    players = %w( Amy Bill Carl ).map {|name| TexasHoldem::Player.factory name }
     new players, small_blind
   end
   
@@ -52,6 +52,6 @@ end
 module HandTestHelper
   def setup
     @hand = TexasHoldem::Hand.factory
-    @slim, @scotty, @doyle = *@hand.players
+    @amy, @bill, @carl = *@hand.players
   end
 end

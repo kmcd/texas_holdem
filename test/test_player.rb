@@ -3,11 +3,11 @@ require 'helper'
 class PlayerTest < Test::Unit::TestCase
   def setup
     @entrance_fee = 100
-    @player = TexasHoldem::Player.new 'Doyle', @entrance_fee
+    @player = TexasHoldem::Player.new 'Carl', @entrance_fee
   end
   
   test "should have a name" do
-    assert_equal 'Doyle', @player.name
+    assert_equal 'Carl', @player.name
   end
   
   test "should have no cards initially" do
