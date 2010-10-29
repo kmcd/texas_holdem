@@ -27,14 +27,18 @@ class HandIdentificationTest < Test::Unit::TestCase
     '10c Jd Qs Kd As'.hand_name 'straight'
   end
   
+  test "should recognise a flush" do
+    '2h 3h 4h 5h 7h'.hand_name 'flush'
+  end
+  
   test "should recognise a full house" do
     '2d 2s 2h 4d 4c'.hand_name 'full house'
     '2d 2s 4h 4d 4c'.hand_name 'full house'
     '2d 4s 2h 4d 4c'.hand_name 'full house'
   end
   
-  test "should recognise a flush" do
-    '2h 3h 4h 5h 7h'.hand_name 'flush'
+  test "should recognise four of a kind" do
+    '2d 2c 2s 2h 3c'.hand_name 'four of a kind'
   end
 end
 
@@ -87,5 +91,23 @@ class WinningHandsTest < Test::Unit::TestCase
   
   test "high card determines winner of flushes" do
     '2h 3h 4h 5h 8h'.beats '2d 3d 4d 5d 7d'
+  end
+  
+  test "full house beats a flush" do
+    '2d 2s 2h 4d 4c'.beats '2d 3d 4d 5d 7d'
+  end
+  
+  test "higher three of a kind determines full house winner" do
+    '3d 3s 3h 4d 4c'.beats '2s 2h 2c Ad Ac'
+    'Ad As Ah 4d 4c'.beats 'Ks Kh Kc Ad Ac'
+  end
+  
+  test "four of a kind beats a full house" do
+    '2d 2c 2s 2h 3c'.beats '3d 3s 3h 4d 4c'
+  end
+  
+  test "higher card determines four of a kind winner" do
+    '3d 3c 3s 3h 4c'.beats '2d 2c 2s 2h 5c'
+    'Ad Ac As Ah 4c'.beats 'Kd Kc Ks Kh 5c'
   end
 end
