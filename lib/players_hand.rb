@@ -1,15 +1,15 @@
-require 'pp'
-
 # TODO: rename to PlayerHand or Player::Hand
 class TexasHoldem::PlayersHand
+  attr_reader :cards
+  
   include Comparable
   MATCHES = { 
-    'one pair'        => /(\d{1,2})\w \1\w/, 
-    'two pair'        => /(\d{1,2})\w \1\w.*(\d{1,2})\w \2\w/,
-    'three of a kind' => /(\d{1,2})\w \1\w \1\w/,
+    'one pair'        => /(\d{1,2})[scdh] \1[scdh]/, 
+    'two pair'        => /(\d{1,2})[scdh] \1[scdh].*(\d{1,2})[scdh] \2[scdh]/,
+    'three of a kind' => /(\d{1,2})[scdh] \1[scdh] \1[scdh]/,
     # OK, this is a bit crazy but straights are the hardest to match
     # It works by building all combinations of possible straights 
-    'straight'        => Regexp.new( (0..8).map {|s| (2..14).to_a[ s..s+4 ].join ' ' }.map {|s| s.gsub /(\d{1,2})/,'\1\w' }.join('|').sub(/^/,'(').sub(/$/,')') ),
+    'straight'        => Regexp.new( (0..8).map {|s| (2..14).to_a[ s..s+4 ].join ' ' }.map {|s| s.gsub /(\d{1,2})/,'\1[scdh]' }.join('|').sub(/^/,'(').sub(/$/,')') ),
     'full house'      => /^(?:(\d) \1{2} (\d) \2|(\d) \3 (\d) \4{2})/x
   }
 
@@ -19,7 +19,7 @@ class TexasHoldem::PlayersHand
     @cards.gsub!(/Q/, '12')
     @cards.gsub!(/K/, '13')
     @cards.gsub!(/A/, '14')
-    @cards.split.sort.join ' '
+    @cards = @cards.split.sort_by {|c| c.gsub(/\D/,'').to_i }.join ' '
   end
   
   def <=>(players_hand)
@@ -31,7 +31,6 @@ class TexasHoldem::PlayersHand
   end
   
   def name
-    # TODO: refactor - ordering of regex matches should not conflict, ie one/two pair
     if full_house?   
       'full house'
     elsif three_of_a_kind?
@@ -72,10 +71,6 @@ class TexasHoldem::PlayersHand
     name == 'high card'
   end   
   
-  def pretty_print(printer)
-    printer.text [ @cards,  name, score ].join " | "
-  end
-  
   protected
   
   def score
@@ -94,7 +89,6 @@ class TexasHoldem::PlayersHand
   
   def relative_score
     case name
-      # TODO: dry up with #name
       when /one pair/ : @cards[MATCHES['one pair'],1].to_i * 2
       when /two pair/ : @cards[MATCHES['two pair'],2].to_i * 2 + @cards[MATCHES['two pair'],2].to_i * 2
       when /three/    : @cards[MATCHES['three of a kind'],1].to_i * 3
