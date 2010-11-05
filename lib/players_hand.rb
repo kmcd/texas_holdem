@@ -1,132 +1,219 @@
 # TODO: rename to PlayerHand or Player::Hand
 class TexasHoldem::PlayersHand
-  attr_reader :cards
+  # TODO: move below current class => TexasHoldem::FourOfAKind < TexasHoldem::PlayersHand
+  class FourOfAKind < self
+    Pattern = /(\d{1,2})[scdh] (?:\s\1[scdh]){3}/x
+    
+    def self.create(cards)
+      new cards if cards.match Pattern
+    end
+    
+    def name
+      'four of a kind'
+    end
+    
+    def base_score
+      7
+    end
+    
+    def relative_score
+      @cards[Pattern,1].to_i
+    end
+  end
   
+  class FullHouse < self
+    Pattern =  /^(?:(\d) \1{2} (\d) \2|(\d) \3 (\d) \4{2})/x
+    
+    def self.create(cards)
+      new(cards) if cards.gsub(/\D/,'').split(//).sort.to_s.match Pattern
+    end
+    
+    def name
+      'full house'
+    end
+    
+    def base_score
+      6
+    end
+    
+    def relative_score
+      @cards[ ThreeOfAKind::Pattern, 1 ].to_i
+    end
+  end
+  
+  class Flush < self
+    Pattern = /\d{1,2}([csdh]) (?:\s\d{1,2}\1){4} /x
+    
+    def self.create(cards)
+      new(cards) if cards.match Pattern
+    end
+    
+    def name
+      'flush'
+    end
+    
+    def base_score
+      5
+    end
+    
+    def relative_score
+      face_values_array.sort.last.to_i
+    end
+  end
+  
+  class Straight < self
+    def self.create(cards)
+      straight = new cards
+      card_values = straight.cards.gsub(/[scdh]/,'').split.map {|card_value| card_value.to_i }
+      new(cards) if (card_values.first..card_values.last).to_a == card_values
+    end
+    
+    def name
+      'straight'
+    end
+    
+    def base_score
+      4
+    end
+    
+    def relative_score
+      face_values_array.last.to_i
+    end
+  end
+  
+  class ThreeOfAKind < self
+    Pattern = /(\d{1,2})[scdh] (?:\s\1[scdh]){2}/x
+    
+    def self.create(cards)
+      new(cards) if cards.match Pattern
+    end
+    
+    def name
+      'three of a kind'
+    end
+    
+    def base_score
+      3
+    end
+    
+    def relative_score
+      @cards[ Pattern, 1 ].to_i
+    end
+  end
+  
+  class TwoPair < self
+    Pattern = /(\d{1,2})[scdh] \1[scdh].*(\d{1,2})[scdh] \2[scdh]/
+    
+    def self.create(cards)
+      new(cards) if cards.match Pattern
+    end
+    
+    def name
+      'two pair'
+    end
+    
+    def base_score
+      2 
+    end
+    
+    def relative_score
+      @cards[ Pattern , 2 ].to_i * 2
+    end
+    
+    def remaining_cards
+      @cards.gsub(Pattern, '').gsub /\D/, ''
+    end
+  end
+  
+  class OnePair < self
+    Pattern = /(\d{1,2})[scdh] (?:\s\1[scdh]){1}/x
+    
+    def self.create(cards)
+      new(cards) if cards.match Pattern
+    end
+    
+    def name
+      'one pair'
+    end
+    
+    def base_score
+      1
+    end
+    
+    def relative_score
+      @cards[ Pattern , 1 ].to_i * 2
+    end
+    
+    def remaining_cards
+      @cards.gsub(Pattern, '').gsub /\D/, ''
+    end
+  end
+  
+  class HighCard < self
+    def self.create(cards)
+      new(cards)
+    end
+    
+    def name
+      'high card'
+    end
+    
+    def base_score
+      0
+    end
+    
+    def relative_score
+      0
+    end
+  end
+  
+  attr_reader :cards
   include Comparable
   
-  # TODO: dry up [scdh] references
-  MATCHES = { 
-    'one pair'        => /(\d{1,2})[scdh] (?:\s\1[scdh]){1}/x,
-    'two pair'        => /(\d{1,2})[scdh] \1[scdh].*(\d{1,2})[scdh] \2[scdh]/,
-    'three of a kind' => /(\d{1,2})[scdh] (?:\s\1[scdh]){2}/x,
-    'four of a kind'  => /(\d{1,2})[scdh] (?:\s\1[scdh]){3}/x,
-  }                                                                           
-
+  # TODO: investigate Builder / Factory pattern
+  def self.create(cards)
+    # TODO: use a hook to populate possible hands using inherited/included
+    possible_hands = [ FourOfAKind, FullHouse, Flush, Straight, ThreeOfAKind, TwoPair, OnePair, HighCard ]
+    
+    # cards could be both OnePair and a FullHouse, so return the highest raking hand
+    possible_hands.map {|hand| hand.create(cards) }.compact.sort_by(&:score).last
+  end
+  
   def initialize(cards)
     @cards = cards
     @cards.gsub!(/J/, '11')
     @cards.gsub!(/Q/, '12')
     @cards.gsub!(/K/, '13')
     @cards.gsub!(/A/, '14')
-    @cards = @cards.split.sort_by {|c| c.gsub(/\D/,'').to_i }.join ' '
+    @cards = @cards.split.sort_by {|card| card.gsub(/\D/,'').to_i }.join ' '
   end
   
   def <=>(players_hand)
-    if score == players_hand.score
+    other_players_hand_score = players_hand.score
+    this_players_score = score
+    
+    if this_players_score == other_players_hand_score
       remaining_cards <=> players_hand.remaining_cards
     else
-      score <=> players_hand.score
+      this_players_score <=> other_players_hand_score
     end
   end
-                                  
-  def name
-    # TODO: refactor to polymorphic type?
-    if four_of_a_kind?
-      'four of a kind'
-    elsif full_house?   
-      'full house'
-    elsif flush?
-      'flush'
-    elsif straight?
-      'straight'
-    elsif three_of_a_kind?
-      'three of a kind'
-    elsif two_pair?
-      'two pair'
-    elsif one_pair?
-      'one pair'
-    else
-      'high card'
-    end
-  end
-  
-  def one_pair?
-    @cards.match MATCHES['one pair']
-  end
-  
-  def two_pair?
-    @cards.match MATCHES['two pair']
-  end
-  
-  def straight?
-    card_sequence = face_values.split.map {|d| d.to_i }
-    (card_sequence.first..card_sequence.last).to_a == card_sequence
-  end       
-  
-  def flush?
-    @cards.match /\d{1,2}([csdh]) (?:\s\d{1,2}\1){4} /x
-  end
-  
-  def three_of_a_kind?
-    @cards.match MATCHES['three of a kind']
-  end
-  
-  def full_house?
-    # TODO: change this to [csdh]
-    @cards.gsub(/\D/,'').match /^(?:(\d) \1{2} (\d) \2|(\d) \3 (\d) \4{2})/x
-  end    
-  
-  def four_of_a_kind?
-    @cards.match MATCHES['four of a kind']
-  end
-  
-  protected
   
   def score
-    base_score + relative_score
-  end
-  
-  def base_score
-    case name
-      when /one pair/   : 1
-      when /two pair/   : 2
-      when /three/      : 3
-      when /straight/   : 4
-      when /flush/      : 5
-      when /full house/ : 6
-      when /four/       : 7
-    else
-      0
-    end * 1000
-  end
-  
-  def relative_score
-    case name
-      when /one pair/   : @cards[MATCHES['one pair'],1].to_i * 2
-      when /two pair/   : @cards[MATCHES['two pair'],2].to_i * 2
-      when /three/      : @cards[MATCHES['three of a kind'],1].to_i * 3
-      when /straight/   : face_values.split.last.to_i
-      when /flush/      : face_values.split.sort.last.to_i
-      when /full house/ : @cards[MATCHES['three of a kind'],1].to_i
-      when /four/       : @cards[MATCHES['four of a kind'],1].to_i
-    else
-      0
-    end                         
+    base_score * 1000 + relative_score
   end
   
   def remaining_cards
-    case name
-      when /high card/ : @cards
-      when /one pair/  : @cards.gsub(MATCHES['one pair'], '')
-      when /two pair/  : @cards.gsub(MATCHES['two pair'], '')
-      else
-        ''
-    end.gsub /[a-z]/, ''
+    @cards.gsub /\D/, ''
   end
   
   private
   
   def face_values
     @cards.gsub(/[scdh]/,'')
+  end
+  
+  def face_values_array
+    face_values.to_a
   end
 end

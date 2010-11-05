@@ -47,6 +47,7 @@ task :class, :name do |task,args|
 end}
 
   write_to "test/test_#{file_name}.rb", %Q{require 'helper'
+  
 class #{class_name}Test < Test::Unit::TestCase
   def setup
   end

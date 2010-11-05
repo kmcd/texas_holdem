@@ -1,8 +1,4 @@
 module TexasHoldem
-  require 'game'
-  require 'hand'
-  require 'player'
-  require 'deck'
-  require 'betting_round'
-  require 'players_hand'
+  ClassFiles = Dir.entries( File.join( File.dirname(__FILE__), '..', 'lib' ) ).grep(/\.rb$/)
+  ClassFiles.each {|klass| require klass.gsub /\.rb/, ''} 
 end

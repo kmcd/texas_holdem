@@ -8,8 +8,6 @@ class HandTest < Test::Unit::TestCase
 end
 
 class HandIdentificationTest < Test::Unit::TestCase
-  # TODO: add more non-sequential matches
-  
   test "should recognise a high card" do
     '2d 3s 5c 6c Ad'.hand_name 'high card'
   end

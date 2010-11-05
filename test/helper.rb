@@ -20,12 +20,13 @@ class String
   include Test::Unit::Assertions
   
   def hand_name(name)
-    assert_equal name, TexasHoldem::PlayersHand.new(self).name
+    hand = TexasHoldem::PlayersHand.create(self)
+    assert_equal name, hand.name, "\n#{hand.cards} not recognised as a #{name}\n"
   end
   
   def beats(loser)
-    winner, loser = TexasHoldem::PlayersHand.new(self), TexasHoldem::PlayersHand.new(loser)
-    assert( winner > loser )
+    winner, loser = TexasHoldem::PlayersHand.create(self), TexasHoldem::PlayersHand.create(loser)
+    assert winner > loser, "\n #{winner.name} (#{winner.score}) should beat #{loser.name} (#{loser.score})\n"
   end
 end
 

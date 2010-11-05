@@ -17,17 +17,17 @@ class TexasHoldem::Deck
   def build
     @cards = []                            
     
-    FACES.each_byte do |f|
-      SUITS.each_byte {|s| @cards.push(f.chr + s.chr) }
+    FACES.each_byte do |face|
+      SUITS.each_byte {|suit| @cards.push(face.chr + suit.chr) }
     end
   end
   
   def shuffle
     3.times do                            
       shuf = []
-      @cards.each do |c|
+      @cards.each do |card|
         loc = rand(shuf.size + 1)
-        shuf.insert(loc, c)
+        shuf.insert(loc, card)
       end
       @cards = shuf.reverse
     end
