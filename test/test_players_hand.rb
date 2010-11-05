@@ -2,7 +2,7 @@ require 'helper'
 
 class HandTest < Test::Unit::TestCase
   test "should always have cards sorted in ascending order by face value" do
-    hand = TexasHoldem::PlayersHand.new('Ad As 5c 6c Jd')
+    hand = TexasHoldem::PlayerHand.new('Ad As 5c 6c Jd')
     assert_equal  "5c 6c 11d 14s 14d", hand.cards
   end
 end
