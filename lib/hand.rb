@@ -32,10 +32,10 @@ class TexasHoldem::Hand
   end
   
   def winner
-    if finished?
-      @players.first.take_winnings @pot
-      @players.first
-    end
+    return unless finished?
+    winning_player = @players.first
+    winning_player.take_winnings @pot
+    winning_player
   end
   
   def finished?
@@ -48,7 +48,7 @@ class TexasHoldem::Hand
   
   def deal
     case round
-      when :pocket : deal_pocket_cards && deduct_blinds # Move to BettingRound?
+      when :pocket : deal_pocket_cards && deduct_blinds
       when :flop   : deal_community_cards 3
       when :turn   : deal_community_cards 1
       when :river  : deal_community_cards 1
